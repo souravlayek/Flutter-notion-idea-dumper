@@ -48,7 +48,21 @@ class _MyHomePageState extends State<MyHomePage> {
       case Mode.blog:
         print({ideaController.text, descriptionController.text, Mode.blog});
         return;
+      case Mode.podcast:
+        print({ideaController.text, descriptionController.text, Mode.podcast});
+        return;
+      case Mode.youtube:
+        print({ideaController.text, descriptionController.text, Mode.youtube});
+        return;
+      case Mode.application:
+        print({
+          ideaController.text,
+          descriptionController.text,
+          Mode.application
+        });
+        return;
       default:
+        throw Exception("You did something wrong");
     }
     ideaController.text = "";
     descriptionController.text = "";
