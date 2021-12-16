@@ -5,6 +5,13 @@ void main() {
   runApp(const MyApp());
 }
 
+enum Mode {
+  blog,
+  youtube,
+  podcast,
+  application,
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -17,8 +24,35 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final ideaController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    ideaController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
+
+  void pushIdea(Mode mode) {
+    switch (mode) {
+      case Mode.blog:
+        print({ideaController.text, descriptionController.text, Mode.blog});
+        return;
+      default:
+    }
+    ideaController.text = "";
+    descriptionController.text = "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +73,7 @@ class MyHomePage extends StatelessWidget {
               imageLink:
                   "https://cdn.mos.cms.futurecdn.net/uazw6gFQuEC29mxMM55Tpb.jpg",
               onTap: () {
-                print("Blog");
+                _showModalBottomSheet(context, Mode.blog);
               },
             ),
             ItemCard(
@@ -48,7 +82,7 @@ class MyHomePage extends StatelessWidget {
               imageLink:
                   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsvPP7I9kDR137YnM-pcpoiOtgOdRMwOOGLuISPggPtzm3M8v9k1fXeYOujdykiRwL5o8&usqp=CAU",
               onTap: () {
-                print("Youtube");
+                _showModalBottomSheet(context, Mode.youtube);
               },
             ),
             ItemCard(
@@ -57,7 +91,7 @@ class MyHomePage extends StatelessWidget {
               imageLink:
                   "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Podcasts_%28iOS%29.svg/2048px-Podcasts_%28iOS%29.svg.png",
               onTap: () {
-                print("Podcast");
+                _showModalBottomSheet(context, Mode.podcast);
               },
             ),
             ItemCard(
@@ -66,12 +100,93 @@ class MyHomePage extends StatelessWidget {
               imageLink:
                   "https://logowik.com/content/uploads/images/visual-studio-code7642.jpg",
               onTap: () {
-                print("Projects");
+                _showModalBottomSheet(context, Mode.podcast);
               },
             ),
           ],
         ),
       ),
+    );
+  }
+
+  _showModalBottomSheet(BuildContext context, Mode mode) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(children: [
+          Container(
+            height: context.screenHeight * 0.8,
+            padding: const EdgeInsets.all(25),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  "Add Your idea".text.gray900.bold.size(30).make(),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.edit),
+                      hintText: 'Enter your idea',
+                      labelText: 'Idea',
+                    ),
+                    controller: ideaController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter some text";
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.note),
+                      hintText: 'Enter your Description',
+                      labelText: 'Description (optional)',
+                    ),
+                    maxLines: 3,
+                    controller: descriptionController,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  [
+                    "Submit"
+                        .text
+                        .size(20)
+                        .blue700
+                        .make()
+                        .box
+                        .roundedSM
+                        .make()
+                        .p12()
+                        .onInkTap(() {
+                      if (_formKey.currentState!.validate()) {
+                        pushIdea(mode);
+                      }
+                    }),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    "Cancel"
+                        .text
+                        .size(20)
+                        .red700
+                        .make()
+                        .box
+                        .roundedSM
+                        .make()
+                        .p12()
+                        .onInkTap(() {
+                      Navigator.pop(context);
+                    })
+                  ].row()
+                ],
+              ),
+            ),
+          )
+        ]);
+      },
+      isScrollControlled: true,
+      isDismissible: false,
     );
   }
 }
